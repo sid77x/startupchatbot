@@ -8,7 +8,11 @@ from llama_index.core import VectorStoreIndex, StorageContext
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.llms.openai import OpenAI
 from llama_index.core.memory import ChatMemoryBuffer
+import sqlite3
+import os
 
+# Set environment variable to use your bundled SQLite binary
+os.environ["LD_LIBRARY_PATH"] = "./" 
 # Page config
 st.set_page_config(page_title="Startup Chat Bot", page_icon="🤖")
 st.title("Startup Information Chat Bot")
