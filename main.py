@@ -5,8 +5,7 @@ import openai
 from llama_index.core.schema import TextNode
 import nest_asyncio
 from llama_index.core import VectorStoreIndex, StorageContext
-from llama_index.storage.vector_store.chroma import ChromaVectorStore
-#from llama_index.vector_stores.chroma import ChromaVectorStore
+from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.llms.openai import OpenAI
 from llama_index.core.memory import ChatMemoryBuffer
 import sqlite3
