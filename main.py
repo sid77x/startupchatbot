@@ -66,7 +66,7 @@ def initialize_chat_engine():
 chat_engine = initialize_chat_engine()
 
 # Check if the file path is set
-file_path = 'C:/Users/gupta/OneDrive/Desktop/Ecell/startup software/startup.txt'
+file_path = 'startup.txt'
 if not os.path.exists(file_path):
     st.error(f"The file path {file_path} does not exist. Please check the path and try again.")
     st.stop()
