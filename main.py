@@ -2,7 +2,7 @@ import streamlit as st
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-#import chromadb
+import chromadb
 import os
 import openai
 from llama_index.core.schema import TextNode
