@@ -9,3 +9,4 @@ prophet
 pandas-datareader
 yfinance
 plotly
+pysqlite3-binary
