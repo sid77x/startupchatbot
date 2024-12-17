@@ -1,5 +1,5 @@
 import streamlit as st
-import chromadb
+#import chromadb
 import os
 import openai
 from llama_index.core.schema import TextNode
@@ -10,6 +10,11 @@ from llama_index.llms.openai import OpenAI
 from llama_index.core.memory import ChatMemoryBuffer
 import sqlite3
 import os
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+import chromadb  # Now import chromadb
 
 # Set environment variable to use your bundled SQLite binary
 os.environ["LD_LIBRARY_PATH"] = "./" 
