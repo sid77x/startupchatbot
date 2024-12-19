@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-find . -name "__pycache__" -delete
 
 from chat_engine import initialize_chat_engine
 from pages import render_home_page, render_startup_page, render_chat_page
