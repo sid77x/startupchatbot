@@ -4,10 +4,6 @@ from chat_engine import initialize_chat_engine
 from pages import render_home_page, render_startup_page, render_chat_page
 from config import (STARTUP_FILE, INNOVATION_CENTRE_STARTUPS, 
                    MUTBI_STARTUPS, MBI_STARTUPS)
-_import_('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-import chromadb
 # Page config
 st.set_page_config(page_title="Startup Chat Bot", page_icon="🤖")
 
