@@ -1,8 +1,8 @@
 import streamlit as st
-__import__('pysqlite3')
+import pysqlite3
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-import chromadb
+import chromadb
 import os
 import openai
 from llama_index.core.schema import TextNode
@@ -22,7 +22,7 @@ def initialize_chat_engine():
 
         with open(STARTUP_FILE, 'r', encoding='utf-8') as file:
             content = file.read()
-
+        
         chunks = content.split('—------------------------------------------------------------------------------')
         nodes = [TextNode(text=chunk.strip()) for chunk in chunks if chunk.strip()]
         
