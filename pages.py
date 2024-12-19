@@ -1,3 +1,6 @@
+import streamlit as st
+from config import INNOVATION_CENTRE_STARTUPS, MUTBI_STARTUPS, MBI_STARTUPS
+from utils import handle_click
 # Method 1: Using Custom CSS for Fixed Position
 def render_unified_page(chat_engine):
     # Enhanced CSS with chat input positioning
