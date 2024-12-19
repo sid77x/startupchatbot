@@ -2,6 +2,12 @@ import streamlit as st
 from config import INNOVATION_CENTRE_STARTUPS, MUTBI_STARTUPS, MBI_STARTUPS
 from utils import handle_click
 
+# Initialize session state variables
+if "trigger_chat" not in st.session_state:
+    st.session_state.trigger_chat = None
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
 def render_unified_page(chat_engine):
     # Add CSS for consistent button sizing
     st.markdown("""
@@ -77,17 +83,17 @@ def render_unified_page(chat_engine):
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-        # Handle user input
-        if prompt := st.chat_input("What would you like to know about startups?"):
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
-            
-            with st.chat_message("assistant"):
-                try:
-                    with st.spinner("Generating response..."):
-                        response = chat_engine.chat(prompt)
-                        st.markdown(response.response)
-                        st.session_state.messages.append({"role": "assistant", "content": response.response})
-                except Exception as e:
-                    st.error(f"Error generating response: {str(e)}")
+    # Handle user input
+    if prompt := st.chat_input("What would you like to know about startups?"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        with st.chat_message("assistant"):
+            try:
+                with st.spinner("Generating response..."):
+                    response = chat_engine.chat(prompt)
+                    st.markdown(response.response)
+                    st.session_state.messages.append({"role": "assistant", "content": response.response})
+            except Exception as e:
+                st.error(f"Error generating response: {str(e)}")
