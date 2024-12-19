@@ -2,68 +2,92 @@ import streamlit as st
 from config import INNOVATION_CENTRE_STARTUPS, MUTBI_STARTUPS, MBI_STARTUPS
 from utils import handle_click
 
-def render_home_page():
-    st.title("Startup Incubators")
-    st.markdown("Select an incubator to learn more about its startups")
+def render_unified_page(chat_engine):
+    # Add CSS for consistent button sizing
+    st.markdown("""
+        <style>
+        .stButton button {
+            height: 60px;
+            white-space: normal;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.button("Innovation Centre", key="home_ic_btn", 
-                 on_click=handle_click, args=("innovation_centre",), use_container_width=True)
-    with col2:
-        st.button("MUTBI", key="home_mutbi_btn", 
-                 on_click=handle_click, args=("mutbi",), use_container_width=True)
-    with col3:
-        st.button("Manipal Bio-Incubator", key="home_mbi_btn", 
-                 on_click=handle_click, args=("manipal_bio_incubator",), use_container_width=True)
+    # Create main columns for layout
+    startup_col, chat_col = st.columns([0.6, 0.4])
 
-def render_startup_page(title, description, startups, page_key):
-    st.title(title)
-    st.markdown(description)
-    
-    st.button("← Back to Home", key=f"{page_key}_back_btn", 
-             on_click=handle_click, args=("home",))
-
-    col1, col2, col3 = st.columns(3)
-    for idx, startup in enumerate(startups):
-        with [col1, col2, col3][idx % 3]:
-            st.button(startup, key=f"{page_key}_startup_{idx}", 
-                     on_click=handle_click, args=("chat", f"Tell me about {startup}"), 
-                     use_container_width=True)
-
-def render_chat_page(chat_engine):
-    st.title("Startup Information Chat Bot")
-    st.markdown("Ask me anything about startups! 💬")
-
-    # Handle triggered chat query
-    if st.session_state.trigger_chat:
-        query = st.session_state.trigger_chat
-        st.session_state.trigger_chat = None
+    with startup_col:
+        st.title("Startup Incubators")
         
-        st.session_state.messages.append({"role": "user", "content": query})
-        try:
-            with st.spinner("Generating response..."):
-                response = chat_engine.chat(query)
-                st.session_state.messages.append({"role": "assistant", "content": response.response})
-        except Exception as e:
-            st.error(f"Error generating response: {str(e)}")
-
-    # Display chat messages
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    # Handle user input
-    if prompt := st.chat_input("What would you like to know about startups?"):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        # Create tabs for each incubator
+        tabs = st.tabs(["Innovation Centre", "MUTBI", "Manipal Bio-Incubator"])
+        incubator_data = [
+            (INNOVATION_CENTRE_STARTUPS, "ic", "Innovation Centre Startups"),
+            (MUTBI_STARTUPS, "mutbi", "MUTBI Startups"),
+            (MBI_STARTUPS, "mbi", "Manipal Bio-Incubator Startups")
+        ]
         
-        with st.chat_message("assistant"):
+        for tab, (startups, key, title) in zip(tabs, incubator_data):
+            with tab:
+                st.subheader(title)
+                
+                # Search and display startups
+                search_query = st.text_input("Search startups", key=f"{key}_search")
+                filtered_startups = [s for s in startups if search_query.lower() in s.lower()] if search_query else startups
+                
+                if not filtered_startups:
+                    st.warning("No startups found matching your search.")
+                    continue
+                    
+                st.markdown(f"Showing {len(filtered_startups)} startups")
+                
+                # Create grid layout for startup buttons
+                cols = st.columns(3)
+                for idx, startup in enumerate(filtered_startups):
+                    with cols[idx % 3]:
+                        st.button(
+                            startup,
+                            key=f"{key}_startup_{idx}",
+                            on_click=handle_click,
+                            args=("chat", f"Tell me about {startup}"),
+                            use_container_width=True
+                        )
+
+    with chat_col:
+        st.title("Chat with AI")
+        
+        # Handle chat functionality
+        if st.session_state.trigger_chat:
+            query = st.session_state.trigger_chat
+            st.session_state.trigger_chat = None
+            st.session_state.messages.append({"role": "user", "content": query})
             try:
                 with st.spinner("Generating response..."):
-                    response = chat_engine.chat(prompt)
-                    st.markdown(response.response)
+                    response = chat_engine.chat(query)
                     st.session_state.messages.append({"role": "assistant", "content": response.response})
             except Exception as e:
                 st.error(f"Error generating response: {str(e)}")
+
+        # Display chat messages
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+        # Handle user input
+        if prompt := st.chat_input("What would you like to know about startups?"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+            
+            with st.chat_message("assistant"):
+                try:
+                    with st.spinner("Generating response..."):
+                        response = chat_engine.chat(prompt)
+                        st.markdown(response.response)
+                        st.session_state.messages.append({"role": "assistant", "content": response.response})
+                except Exception as e:
+                    st.error(f"Error generating response: {str(e)}")
