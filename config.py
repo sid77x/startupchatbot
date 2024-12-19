@@ -1,7 +1,7 @@
 import os
 
 # File paths
-STARTUP_FILE = 'C:/Users/gupta/OneDrive/Desktop/Ecell/startup software/breakdown_test/startup.txt'
+STARTUP_FILE = 'startup.txt'
 DB_DIR = "C:/Users/gupta/OneDrive/Desktop/Ecell/startup software/chroma_db"
 
 # Startup lists
