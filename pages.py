@@ -13,12 +13,20 @@ def render_unified_page(chat_engine):
             align-items: center;
             justify-content: center;
         }
-        .chat-input-container {
+        .custom-input-container {
             position: relative;
             width: 100%;
             max-width: 400px; /* Adjust max width */
             margin: 0 auto; /* Center align */
             padding-top: 1rem;
+        }
+        .custom-textarea {
+            width: 100%;
+            resize: none;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -82,20 +90,27 @@ def render_unified_page(chat_engine):
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-        # Chat input restricted to "Chat with AI" column
-        st.markdown('<div class="chat-input-container">', unsafe_allow_html=True)
-        prompt = st.chat_input("What would you like to know about startups?")
-        if prompt:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
-            
-            with st.chat_message("assistant"):
-                try:
-                    with st.spinner("Generating response..."):
-                        response = chat_engine.chat(prompt)
-                        st.markdown(response.response)
-                        st.session_state.messages.append({"role": "assistant", "content": response.response})
-                except Exception as e:
-                    st.error(f"Error generating response: {str(e)}")
+        # Custom input restricted to "Chat with AI" column
+        st.markdown('<div class="custom-input-container">', unsafe_allow_html=True)
+        prompt = st.text_area(
+            "Type your query:",
+            placeholder="What would you like to know about startups?",
+            key="custom_chat_input",
+            height=50
+        )
         st.markdown('</div>', unsafe_allow_html=True)
+
+        if st.button("Send", key="send_button"):
+            if prompt:
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+                
+                with st.chat_message("assistant"):
+                    try:
+                        with st.spinner("Generating response..."):
+                            response = chat_engine.chat(prompt)
+                            st.markdown(response.response)
+                            st.session_state.messages.append({"role": "assistant", "content": response.response})
+                    except Exception as e:
+                        st.error(f"Error generating response: {str(e)}")
