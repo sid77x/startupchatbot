@@ -82,8 +82,6 @@ def render_unified_page(chat_engine):
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
-
-    # Handle user input
         if prompt := st.chat_input("What would you like to know about startups?"):
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
@@ -97,3 +95,4 @@ def render_unified_page(chat_engine):
                         st.session_state.messages.append({"role": "assistant", "content": response.response})
                 except Exception as e:
                     st.error(f"Error generating response: {str(e)}")
+  
