@@ -84,16 +84,16 @@ def render_unified_page(chat_engine):
                 st.markdown(message["content"])
 
     # Handle user input
-    if prompt := st.chat_input("What would you like to know about startups?"):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        
-        with st.chat_message("assistant"):
-            try:
-                with st.spinner("Generating response..."):
-                    response = chat_engine.chat(prompt)
-                    st.markdown(response.response)
-                    st.session_state.messages.append({"role": "assistant", "content": response.response})
-            except Exception as e:
-                st.error(f"Error generating response: {str(e)}")
+        if prompt := st.chat_input("What would you like to know about startups?"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+            
+            with st.chat_message("assistant"):
+                try:
+                    with st.spinner("Generating response..."):
+                        response = chat_engine.chat(prompt)
+                        st.markdown(response.response)
+                        st.session_state.messages.append({"role": "assistant", "content": response.response})
+                except Exception as e:
+                    st.error(f"Error generating response: {str(e)}")
