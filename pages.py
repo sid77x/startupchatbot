@@ -23,21 +23,22 @@ def render_unified_page(chat_engine):
         </style>
     """, unsafe_allow_html=True)
 
-    # Create main columns for layout
-    startup_col, chat_col = st.columns([0.6, 0.4])
+    st.title("Startup Incubators Chat Interface")
 
-    with startup_col:
-        st.title("Startup Incubators")
-        
+    # Create tabs for the main interface
+    main_tabs = st.tabs(["Startups Directory", "Chat Interface"])
+
+    # Startups Directory Tab
+    with main_tabs[0]:
         # Create tabs for each incubator
-        tabs = st.tabs(["Innovation Centre", "MUTBI", "Manipal Bio-Incubator"])
+        incubator_tabs = st.tabs(["Innovation Centre", "MUTBI", "Manipal Bio-Incubator"])
         incubator_data = [
             (INNOVATION_CENTRE_STARTUPS, "ic", "Innovation Centre Startups"),
             (MUTBI_STARTUPS, "mutbi", "MUTBI Startups"),
             (MBI_STARTUPS, "mbi", "Manipal Bio-Incubator Startups")
         ]
         
-        for tab, (startups, key, title) in zip(tabs, incubator_data):
+        for tab, (startups, key, title) in zip(incubator_tabs, incubator_data):
             with tab:
                 st.subheader(title)
                 
@@ -63,10 +64,11 @@ def render_unified_page(chat_engine):
                             use_container_width=True
                         )
 
-    with chat_col:
-        st.title("Chat with AI")
+    # Chat Interface Tab
+    with main_tabs[1]:
+        st.subheader("Chat with AI")
         
-        # Handle chat functionality
+        # Handle triggered chat queries
         if st.session_state.trigger_chat:
             query = st.session_state.trigger_chat
             st.session_state.trigger_chat = None
@@ -82,7 +84,10 @@ def render_unified_page(chat_engine):
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
-        if prompt := st.chat_input("What would you like to know about startups?"):
+
+        # Chat input - Now correctly placed at the root level of the chat tab
+        prompt = st.chat_input("What would you like to know about startups?")
+        if prompt:
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
                 st.markdown(prompt)
@@ -95,4 +100,3 @@ def render_unified_page(chat_engine):
                         st.session_state.messages.append({"role": "assistant", "content": response.response})
                 except Exception as e:
                     st.error(f"Error generating response: {str(e)}")
-  
