@@ -1,5 +1,5 @@
 # Method 1: Using Custom CSS for Fixed Position
-def render_unified_page_css_method(chat_engine):
+def render_unified_page(chat_engine):
     # Enhanced CSS with chat input positioning
     st.markdown("""
         <style>
