@@ -6,7 +6,7 @@ def render_unified_page(chat_engine):
     st.markdown("""
         <style>
         .stButton button {
-            height: 60px;
+            height: 50px;
             white-space: normal;
             text-align: center;
             display: flex;
@@ -16,7 +16,7 @@ def render_unified_page(chat_engine):
         .custom-input-container {
             position: relative;
             width: 100%;
-            max-width: 400px; /* Adjust max width */
+            max-width: 300px; /* Adjust max width */
             margin: 0 auto; /* Center align */
             padding-top: 1rem;
         }
