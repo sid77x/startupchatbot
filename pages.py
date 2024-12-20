@@ -96,7 +96,7 @@ def render_unified_page(chat_engine):
             "Type your query:",
             placeholder="What would you like to know about startups?",
             key="custom_chat_input",
-            height=50
+            height=35
         )
         st.markdown('</div>', unsafe_allow_html=True)
 
