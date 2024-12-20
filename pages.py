@@ -15,6 +15,7 @@ def render_unified_page(chat_engine):
         }
         .custom-input-container {
             position: relative;
+            height: 50px;
             width: 100%;
             max-width: 300px; /* Adjust max width */
             margin: 0 auto; /* Center align */
