@@ -36,8 +36,8 @@ def render_unified_page(chat_engine):
     # Initialize session state variables
     if 'trigger_chat' not in st.session_state:
         st.session_state.trigger_chat = None
-    if 'messages' not in st.session_state:
-        st.session_state.messages = []
+    if 'current_response' not in st.session_state:
+        st.session_state.current_response = None
 
     startup_col, chat_col = st.columns([0.6, 0.4])
 
@@ -76,25 +76,13 @@ def render_unified_page(chat_engine):
 
     with chat_col:
         st.title("Chat with AI")
-        
-        if st.session_state.trigger_chat:
-            query = st.session_state.trigger_chat
-            st.session_state.trigger_chat = None
-            st.session_state.messages.append({"role": "user", "content": query})
-            try:
-                with st.spinner("Generating response..."):
-                    response = chat_engine.chat(query)
-                    st.session_state.messages.append({"role": "assistant", "content": response.response})
-            except Exception as e:
-                st.error(f"Error generating response: {str(e)}")
 
-        # Only display the most recent conversation
-        if st.session_state.messages:
-            latest_message = st.session_state.messages[-1]
-            with st.chat_message(latest_message["role"]):
-                st.markdown(latest_message["content"])
+        # Display only the current response
+        if st.session_state.current_response:
+            with st.chat_message("assistant"):
+                st.markdown(st.session_state.current_response)
 
-        # Custom input restricted to "Chat with AI" column
+        # Custom input directly below the "Chat with AI" title
         st.markdown('<div class="custom-input-container">', unsafe_allow_html=True)
         prompt = st.text_area(
             "Type your query:",
@@ -106,8 +94,8 @@ def render_unified_page(chat_engine):
 
         if st.button("Send", key="send_button"):
             if prompt:
-                # Clear messages before displaying the latest
-                st.session_state.messages = [{"role": "user", "content": prompt}]
+                # Clear previous response
+                st.session_state.current_response = None
                 with st.chat_message("user"):
                     st.markdown(prompt)
                 
@@ -116,6 +104,6 @@ def render_unified_page(chat_engine):
                         with st.spinner("Generating response..."):
                             response = chat_engine.chat(prompt)
                             st.markdown(response.response)
-                            st.session_state.messages.append({"role": "assistant", "content": response.response})
+                            st.session_state.current_response = response.response
                     except Exception as e:
                         st.error(f"Error generating response: {str(e)}")
