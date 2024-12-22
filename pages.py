@@ -76,13 +76,23 @@ def render_unified_page(chat_engine):
 
     with chat_col:
         st.title("Chat with AI")
+        if st.session_state.trigger_chat:
+            query = st.session_state.trigger_chat
+            st.session_state.trigger_chat = None
+            st.session_state.messages.append({"role": "user", "content": query})
+            try:
+                with st.spinner("Generating response..."):
+                    response = chat_engine.chat(query)
+                    st.session_state.messages.append({"role": "assistant", "content": response.response})
+            except Exception as e:
+                st.error(f"Error generating response: {str(e)}")
 
-        # Display only the current response
-        if st.session_state.current_response:
-            with st.chat_message("assistant"):
-                st.markdown(st.session_state.current_response)
-
-        # Custom input directly below the "Chat with AI" title
+        # Display chat messages
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+        
+        # Input field fixed below the title
         st.markdown('<div class="custom-input-container">', unsafe_allow_html=True)
         prompt = st.text_area(
             "Type your query:",
@@ -94,11 +104,7 @@ def render_unified_page(chat_engine):
 
         if st.button("Send", key="send_button"):
             if prompt:
-                # Clear previous response
-                st.session_state.current_response = None
-                with st.chat_message("user"):
-                    st.markdown(prompt)
-                
+                # Process and display only the current response
                 with st.chat_message("assistant"):
                     try:
                         with st.spinner("Generating response..."):
