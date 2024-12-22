@@ -3,7 +3,6 @@ from config import INNOVATION_CENTRE_STARTUPS, MUTBI_STARTUPS, MBI_STARTUPS
 from utils import handle_click
 
 def render_unified_page(chat_engine):
-    # Custom CSS for chat input width and column constraints
     st.markdown("""
         <style>
         .stButton button {
@@ -34,23 +33,17 @@ def render_unified_page(chat_engine):
             max-width: 100%;
             overflow-x: hidden;
             word-wrap: break-word;
+            margin-top: 20px;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # Initialize session state variables
-    if 'trigger_chat' not in st.session_state:
-        st.session_state.trigger_chat = None
-    
-    # Define columns
+    # Define main columns
     startup_col, chat_col = st.columns([0.6, 0.4])
 
     # Startup Incubators Section
     with startup_col:
         st.title("Startup Incubators")
-        
-        # Container for startup response
-        startup_response_container = st.container()
         
         tabs = st.tabs(["Innovation Centre", "MUTBI", "Manipal Bio-Incubator"])
         incubator_data = [
@@ -58,6 +51,9 @@ def render_unified_page(chat_engine):
             (MUTBI_STARTUPS, "mutbi", "MUTBI Startups"),
             (MBI_STARTUPS, "mbi", "Manipal Bio-Incubator Startups")
         ]
+
+        # Create a placeholder for startup response at the top level of startup column
+        startup_response_placeholder = st.empty()
 
         for tab, (startups, key, title) in zip(tabs, incubator_data):
             with tab:
@@ -79,7 +75,7 @@ def render_unified_page(chat_engine):
                             key=f"{key}_startup_{idx}",
                             use_container_width=True
                         ):
-                            with startup_response_container:
+                            with startup_response_placeholder:
                                 try:
                                     with st.spinner("Generating response..."):
                                         response = chat_engine.chat(f"Tell me about {startup}")
@@ -96,9 +92,6 @@ def render_unified_page(chat_engine):
     with chat_col:
         st.title("Chat with AI")
 
-        # Container for chat response
-        chat_response_container = st.container()
-
         # Input field fixed below the title
         st.markdown('<div class="custom-input-container">', unsafe_allow_html=True)
         prompt = st.text_area(
@@ -109,9 +102,12 @@ def render_unified_page(chat_engine):
         )
         st.markdown('</div>', unsafe_allow_html=True)
 
+        # Create a placeholder for chat response
+        chat_response_placeholder = st.empty()
+
         if st.button("Send", key="send_button"):
             if prompt:
-                with chat_response_container:
+                with chat_response_placeholder:
                     try:
                         with st.spinner("Generating response..."):
                             response = chat_engine.chat(prompt)
