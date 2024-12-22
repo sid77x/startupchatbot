@@ -73,65 +73,64 @@ def render_unified_page(chat_engine):
                             args=("chat", f"Tell me about {startup}"),
                             use_container_width=True
                         )
+                if st.session_state.trigger_chat:
+                    query = st.session_state.trigger_chat
+                    st.session_state.trigger_chat = None
+                
+                    # Clear previous messages for startup section
+                    st.session_state.startup_messages = [{"role": "user", "content": query}]
+                
+                    try:
+                        with st.spinner("Generating response..."):
+                            response = chat_engine.chat(query)
+                            st.session_state.startup_messages.append(
+                                {"role": "assistant", "content": response.response}
+                            )
+                    except Exception as e:
+                        st.error(f"Error generating response: {str(e)}")
+                
+                # Display messages only for "Startup Incubators" section
+                if "startup_messages" in st.session_state:
+                    for message in st.session_state.startup_messages:
+                        with st.chat_message(message["role"]):
+                            st.markdown(message["content"])
+
 
    with chat_col:
-    st.title("Chat with AI")
-
-    # Input field fixed below the title
-    st.markdown('<div class="custom-input-container">', unsafe_allow_html=True)
-    prompt = st.text_area(
-        "Type your query:",
-        placeholder="What would you like to know about startups?",
-        key="custom_chat_input",
-        height=35
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    if st.button("Send", key="send_button"):
-        if prompt:
-            # Clear chat messages for new query
-            st.session_state.chat_messages = [{"role": "user", "content": prompt}]
-
-            with st.chat_message("user"):
-                st.markdown(prompt)
-
-            # Generate and display the assistant's response
-            with st.chat_message("assistant"):
-                try:
-                    with st.spinner("Generating response..."):
-                        response = chat_engine.chat(prompt)
-                        st.session_state.chat_messages.append(
-                            {"role": "assistant", "content": response.response}
-                        )
-                        st.markdown(response.response)
-                except Exception as e:
-                    st.error(f"Error generating response: {str(e)}")
-
-    # Display chat messages only for "Chat with AI" section
-    if "chat_messages" in st.session_state:
-        for message in st.session_state.chat_messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-
-# Startup Incubators Section
-if st.session_state.trigger_chat:
-    query = st.session_state.trigger_chat
-    st.session_state.trigger_chat = None
-
-    # Clear previous messages for startup section
-    st.session_state.startup_messages = [{"role": "user", "content": query}]
-
-    try:
-        with st.spinner("Generating response..."):
-            response = chat_engine.chat(query)
-            st.session_state.startup_messages.append(
-                {"role": "assistant", "content": response.response}
-            )
-    except Exception as e:
-        st.error(f"Error generating response: {str(e)}")
-
-# Display messages only for "Startup Incubators" section
-if "startup_messages" in st.session_state:
-    for message in st.session_state.startup_messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+        st.title("Chat with AI")
+    
+        # Input field fixed below the title
+        st.markdown('<div class="custom-input-container">', unsafe_allow_html=True)
+        prompt = st.text_area(
+            "Type your query:",
+            placeholder="What would you like to know about startups?",
+            key="custom_chat_input",
+            height=35
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+        if st.button("Send", key="send_button"):
+            if prompt:
+                # Clear chat messages for new query
+                st.session_state.chat_messages = [{"role": "user", "content": prompt}]
+    
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+    
+                # Generate and display the assistant's response
+                with st.chat_message("assistant"):
+                    try:
+                        with st.spinner("Generating response..."):
+                            response = chat_engine.chat(prompt)
+                            st.session_state.chat_messages.append(
+                                {"role": "assistant", "content": response.response}
+                            )
+                            st.markdown(response.response)
+                    except Exception as e:
+                        st.error(f"Error generating response: {str(e)}")
+    
+        # Display chat messages only for "Chat with AI" section
+        if "chat_messages" in st.session_state:
+            for message in st.session_state.chat_messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
