@@ -45,6 +45,7 @@ def render_unified_page(chat_engine):
     with startup_col:
         st.title("Startup Incubators")
         
+        # First display all tabs and buttons
         tabs = st.tabs(["Innovation Centre", "MUTBI", "Manipal Bio-Incubator"])
         incubator_data = [
             (INNOVATION_CENTRE_STARTUPS, "ic", "Innovation Centre Startups"),
@@ -52,8 +53,7 @@ def render_unified_page(chat_engine):
             (MBI_STARTUPS, "mbi", "Manipal Bio-Incubator Startups")
         ]
 
-        # Create a placeholder for startup response at the top level of startup column
-        startup_response_placeholder = st.empty()
+        clicked_startup = None
 
         for tab, (startups, key, title) in zip(tabs, incubator_data):
             with tab:
@@ -75,18 +75,21 @@ def render_unified_page(chat_engine):
                             key=f"{key}_startup_{idx}",
                             use_container_width=True
                         ):
-                            with startup_response_placeholder:
-                                try:
-                                    with st.spinner("Generating response..."):
-                                        response = chat_engine.chat(f"Tell me about {startup}")
-                                        st.markdown('<div class="startup-messages">', unsafe_allow_html=True)
-                                        with st.chat_message("user"):
-                                            st.markdown(f"Tell me about {startup}")
-                                        with st.chat_message("assistant"):
-                                            st.markdown(response.response)
-                                        st.markdown('</div>', unsafe_allow_html=True)
-                                except Exception as e:
-                                    st.error(f"Error generating response: {str(e)}")
+                            clicked_startup = startup
+
+        # Then show response below all tabs if a startup was clicked
+        if clicked_startup:
+            try:
+                with st.spinner("Generating response..."):
+                    response = chat_engine.chat(f"Tell me about {clicked_startup}")
+                    st.markdown('<div class="startup-messages">', unsafe_allow_html=True)
+                    with st.chat_message("user"):
+                        st.markdown(f"Tell me about {clicked_startup}")
+                    with st.chat_message("assistant"):
+                        st.markdown(response.response)
+                    st.markdown('</div>', unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"Error generating response: {str(e)}")
 
     # Chat with AI Section
     with chat_col:
@@ -102,18 +105,14 @@ def render_unified_page(chat_engine):
         )
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # Create a placeholder for chat response
-        chat_response_placeholder = st.empty()
-
         if st.button("Send", key="send_button"):
             if prompt:
-                with chat_response_placeholder:
-                    try:
-                        with st.spinner("Generating response..."):
-                            response = chat_engine.chat(prompt)
-                            with st.chat_message("user"):
-                                st.markdown(prompt)
-                            with st.chat_message("assistant"):
-                                st.markdown(response.response)
-                    except Exception as e:
-                        st.error(f"Error generating response: {str(e)}")
+                try:
+                    with st.spinner("Generating response..."):
+                        response = chat_engine.chat(prompt)
+                        with st.chat_message("user"):
+                            st.markdown(prompt)
+                        with st.chat_message("assistant"):
+                            st.markdown(response.response)
+                except Exception as e:
+                    st.error(f"Error generating response: {str(e)}")
