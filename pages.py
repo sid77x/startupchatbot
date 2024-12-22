@@ -3,7 +3,7 @@ from config import INNOVATION_CENTRE_STARTUPS, MUTBI_STARTUPS, MBI_STARTUPS
 from utils import handle_click
 
 def render_unified_page(chat_engine):
-    # Custom CSS for chat input width and container alignment
+    # Custom CSS for chat input width and column constraints
     st.markdown("""
         <style>
         .stButton button {
@@ -18,13 +18,23 @@ def render_unified_page(chat_engine):
             position: relative;
             height: 50px;
             width: 100%;
-            max-width: 300px; /* Adjust max width */
-            margin: 0 auto; /* Center align */
+            max-width: 300px;
+            margin: 0 auto;
             padding-top: 1rem;
         }
-        .custom-chat-container {
-            max-width: 600px;
-            margin: 0 auto;
+        .custom-textarea {
+            width: 100%;
+            resize: none;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        /* Add styles for startup column messages */
+        .startup-messages {
+            max-width: 100%;
+            overflow-x: hidden;
+            word-wrap: break-word;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -43,7 +53,7 @@ def render_unified_page(chat_engine):
     # Startup Incubators Section
     with startup_col:
         st.title("Startup Incubators")
-
+        
         tabs = st.tabs(["Innovation Centre", "MUTBI", "Manipal Bio-Incubator"])
         incubator_data = [
             (INNOVATION_CENTRE_STARTUPS, "ic", "Innovation Centre Startups"),
@@ -60,10 +70,10 @@ def render_unified_page(chat_engine):
                 if not filtered_startups:
                     st.warning("No startups found matching your search.")
                     continue
-
+                    
                 st.markdown(f"Showing {len(filtered_startups)} startups")
                 cols = st.columns(3)
-
+                
                 for idx, startup in enumerate(filtered_startups):
                     with cols[idx % 3]:
                         st.button(
@@ -73,31 +83,14 @@ def render_unified_page(chat_engine):
                             args=("chat", f"Tell me about {startup}"),
                             use_container_width=True
                         )
-    
-    # Handle trigger_chat
-    if st.session_state.trigger_chat:
-        query = st.session_state.trigger_chat
-        st.session_state.trigger_chat = None
-
-        # Clear previous messages for Startup Incubators
-        st.session_state.startup_messages = [{"role": "user", "content": query}]
-
-        try:
-            with st.spinner("Generating response..."):
-                response = chat_engine.chat(query)
-                st.session_state.startup_messages.append(
-                    {"role": "assistant", "content": response.response}
-                )
-        except Exception as e:
-            st.error(f"Error generating response: {str(e)}")
-
-    # Display Startup Incubator Messages
-    if "startup_messages" in st.session_state:
-        st.markdown('<div class="custom-chat-container">', unsafe_allow_html=True)
-        for message in st.session_state.startup_messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Display Startup Incubator Messages with width constraint
+        if st.session_state.startup_messages:
+            st.markdown('<div class="startup-messages">', unsafe_allow_html=True)
+            for message in st.session_state.startup_messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+            st.markdown('</div>', unsafe_allow_html=True)
 
     # Chat with AI Section
     with chat_col:
@@ -115,27 +108,34 @@ def render_unified_page(chat_engine):
 
         if st.button("Send", key="send_button"):
             if prompt:
-                # Clear chat messages for new query
-                st.session_state.chat_messages = [{"role": "user", "content": prompt}]
+                # Add message to session state
+                st.session_state.chat_messages.append({"role": "user", "content": prompt})
 
-                # Display user's query
-                with st.chat_message("user"):
-                    st.markdown(prompt)
-
-                # Generate and display the assistant's response
                 try:
                     with st.spinner("Generating response..."):
                         response = chat_engine.chat(prompt)
                         st.session_state.chat_messages.append(
                             {"role": "assistant", "content": response.response}
                         )
-                        with st.chat_message("assistant"):
-                            st.markdown(response.response)
                 except Exception as e:
                     st.error(f"Error generating response: {str(e)}")
 
         # Display chat messages for "Chat with AI"
-        if "chat_messages" in st.session_state:
-            for message in st.session_state.chat_messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
+        for message in st.session_state.chat_messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
+    # Handle trigger_chat
+    if st.session_state.trigger_chat:
+        query = st.session_state.trigger_chat
+        st.session_state.trigger_chat = None
+
+        try:
+            with st.spinner("Generating response..."):
+                response = chat_engine.chat(query)
+                st.session_state.startup_messages = [
+                    {"role": "user", "content": query},
+                    {"role": "assistant", "content": response.response}
+                ]
+        except Exception as e:
+            st.error(f"Error generating response: {str(e)}")
