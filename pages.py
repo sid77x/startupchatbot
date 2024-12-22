@@ -1,6 +1,7 @@
 import streamlit as st
 from config import INNOVATION_CENTRE_STARTUPS, MUTBI_STARTUPS, MBI_STARTUPS
 from utils import handle_click
+
 def render_unified_page(chat_engine):
     # Custom CSS for chat input width
     st.markdown("""
@@ -87,9 +88,11 @@ def render_unified_page(chat_engine):
             except Exception as e:
                 st.error(f"Error generating response: {str(e)}")
 
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+        # Only display the most recent conversation
+        if st.session_state.messages:
+            latest_message = st.session_state.messages[-1]
+            with st.chat_message(latest_message["role"]):
+                st.markdown(latest_message["content"])
 
         # Custom input restricted to "Chat with AI" column
         st.markdown('<div class="custom-input-container">', unsafe_allow_html=True)
@@ -103,7 +106,8 @@ def render_unified_page(chat_engine):
 
         if st.button("Send", key="send_button"):
             if prompt:
-                st.session_state.messages.append({"role": "user", "content": prompt})
+                # Clear messages before displaying the latest
+                st.session_state.messages = [{"role": "user", "content": prompt}]
                 with st.chat_message("user"):
                     st.markdown(prompt)
                 
