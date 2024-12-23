@@ -74,4 +74,6 @@ def render_unified_page(chat_engine):
                     st.markdown(f"Tell me about {clicked_startup}")
                 with st.chat_message("assistant"):
                     st.markdown(response.response)
-                st.markdown('</div>', 
+                st.markdown('</div>', unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Error generating response: {str(e)}")
