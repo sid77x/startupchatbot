@@ -21,14 +21,6 @@ def render_unified_page(chat_engine):
             margin: 0 auto;
             padding-top: 1rem;
         }
-        .custom-textarea {
-            width: 100%;
-            resize: none;
-            padding: 10px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
         .startup-messages {
             max-width: 100%;
             overflow-x: hidden;
@@ -39,7 +31,7 @@ def render_unified_page(chat_engine):
     """, unsafe_allow_html=True)
 
     # Define main columns
-    startup_col, chat_col = st.columns([0.6, 0.4])
+    startup_col = st.columns([1])
 
     # Startup Incubators Section
     with startup_col:
@@ -90,29 +82,3 @@ def render_unified_page(chat_engine):
                     st.markdown('</div>', unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Error generating response: {str(e)}")
-
-    # Chat with AI Section
-    with chat_col:
-        st.title("Chat with AI")
-
-        # Input field fixed below the title
-        st.markdown('<div class="custom-input-container">', unsafe_allow_html=True)
-        prompt = st.text_area(
-            "Type your query:",
-            placeholder="What would you like to know about startups?",
-            key="custom_chat_input",
-            height=35
-        )
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        if st.button("Send", key="send_button"):
-            if prompt:
-                try:
-                    with st.spinner("Generating response..."):
-                        response = chat_engine.chat(prompt)
-                        with st.chat_message("user"):
-                            st.markdown(prompt)
-                        with st.chat_message("assistant"):
-                            st.markdown(response.response)
-                except Exception as e:
-                    st.error(f"Error generating response: {str(e)}")
