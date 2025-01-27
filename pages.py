@@ -3,6 +3,7 @@ from config import INNOVATION_CENTRE_STARTUPS, MUTBI_STARTUPS, MBI_STARTUPS
 from utils import handle_click
 
 def render_unified_page(chat_engine):
+    # Define a custom style for buttons and layout
     st.markdown("""
         <style>
         .stButton button {
@@ -32,31 +33,38 @@ def render_unified_page(chat_engine):
 
     st.title("Startup Incubators")
     
-    # First display all tabs and buttons
-    tabs = st.tabs(["Innovation Centre", "MUTBI", "Manipal Bio-Incubator"])
+    # Define incubator data to avoid repetition
     incubator_data = [
         (INNOVATION_CENTRE_STARTUPS, "ic", "Innovation Centre Startups"),
         (MUTBI_STARTUPS, "mutbi", "MUTBI Startups"),
         (MBI_STARTUPS, "mbi", "Manipal Bio-Incubator Startups")
     ]
 
-    clicked_startup = None
+    # Display tabs for each incubator
+    tabs = st.tabs([data[2] for data in incubator_data])
+    clicked_startup = None  # Initialize clicked startup
 
+    # Iterate through tabs and display their content
     for tab, (startups, key, title) in zip(tabs, incubator_data):
         with tab:
             st.subheader(title)
+            # Add a search bar for filtering startups
             search_query = st.text_input(f"Search {title}", key=f"{key}_search")
-            filtered_startups = [s for s in startups if search_query.lower() in s.lower()] if search_query else startups
-            
+            filtered_startups = [
+                s for s in startups if search_query.lower() in s.lower()
+            ] if search_query else startups
+
             if not filtered_startups:
-                st.warning("No startups found matching your search.")
+                st.warning(f"No startups found matching your search for '{search_query}'.")
                 continue
-                
-            st.markdown(f"Showing {len(filtered_startups)} startups")
-            cols = st.columns(3)
             
+            # Show the filtered startup count and organize buttons in columns
+            st.markdown(f"**Showing {len(filtered_startups)} startups:**")
+            cols = st.columns(3)  # Divide into 3 columns for better layout
+            
+            # Generate buttons for each startup
             for idx, startup in enumerate(filtered_startups):
-                with cols[idx % 3]:
+                with cols[idx % 3]:  # Distribute buttons across columns
                     if st.button(
                         startup,
                         key=f"{key}_startup_{idx}",
@@ -64,11 +72,12 @@ def render_unified_page(chat_engine):
                     ):
                         clicked_startup = startup
 
-    # Then show response below all tabs if a startup was clicked
+    # Generate response for the selected startup
     if clicked_startup:
         try:
-            with st.spinner("Generating response..."):
+            with st.spinner(f"Fetching details for '{clicked_startup}'..."):
                 response = chat_engine.chat(f"Tell me about {clicked_startup}")
+                # Display user query and assistant's response
                 st.markdown('<div class="startup-messages">', unsafe_allow_html=True)
                 with st.chat_message("user"):
                     st.markdown(f"Tell me about {clicked_startup}")
