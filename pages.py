@@ -73,29 +73,29 @@ def render_unified_page(chat_engine):
                         clicked_startup = startup
 
     # Generate response for the selected startup
-if clicked_startup:
-    try:
-        with st.spinner(f"Fetching details for '{clicked_startup}'..."):
-            response = chat_engine.chat(f"Tell me about {clicked_startup}")
-            # Parse response into fields
-            details = response.response  # Assuming the response is a formatted string
-
-            # Structured output (update this based on your actual response data format)
-            st.markdown('<div class="startup-messages">', unsafe_allow_html=True)
-            with st.chat_message("user"):
-                st.markdown(f"Tell me about {clicked_startup}")
-            with st.chat_message("assistant"):
-                st.markdown(f"""
-                    <div>
-                        <b>📌 Startup Name:</b> {clicked_startup}<br>
-                        <b>📝 Description:</b> {details.get("description", "N/A")}<br>
-                        <b>🌐 Website:</b> <a href="{details.get("website", "#")}" target="_blank">{details.get("website", "Not available")}</a><br>
-                        <b>📧 Email:</b> {details.get("email", "Not available")}<br>
-                        <b>📞 Contact Number:</b> {details.get("contact_number", "Not available")}<br>
-                        <b>📍 Stall Number:</b> {details.get("stall_number", "Not present")}<br>
-                    </div>
-                """, unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-    except Exception as e:
-        st.error(f"Error generating response: {str(e)}")
-
+    if clicked_startup:
+        try:
+            with st.spinner(f"Fetching details for '{clicked_startup}'..."):
+                response = chat_engine.chat(f"Tell me about {clicked_startup}")
+                # Parse response into fields
+                details = response.response  # Assuming the response is a formatted string
+    
+                # Structured output (update this based on your actual response data format)
+                st.markdown('<div class="startup-messages">', unsafe_allow_html=True)
+                with st.chat_message("user"):
+                    st.markdown(f"Tell me about {clicked_startup}")
+                with st.chat_message("assistant"):
+                    st.markdown(f"""
+                        <div>
+                            <b>📌 Startup Name:</b> {clicked_startup}<br>
+                            <b>📝 Description:</b> {details.get("description", "N/A")}<br>
+                            <b>🌐 Website:</b> <a href="{details.get("website", "#")}" target="_blank">{details.get("website", "Not available")}</a><br>
+                            <b>📧 Email:</b> {details.get("email", "Not available")}<br>
+                            <b>📞 Contact Number:</b> {details.get("contact_number", "Not available")}<br>
+                            <b>📍 Stall Number:</b> {details.get("stall_number", "Not present")}<br>
+                        </div>
+                    """, unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Error generating response: {str(e)}")
+    
